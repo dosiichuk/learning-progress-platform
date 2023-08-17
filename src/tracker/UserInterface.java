@@ -2,7 +2,6 @@ package tracker;
 
 import tracker.enums.CommandType;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -36,11 +35,20 @@ public class UserInterface {
             case ADD_STUDENTS:
                 studentDatabase.addStudent();
                 break;
+            case LIST:
+                studentDatabase.listStudents();
+                break;
+            case ADD_POINTS:
+                studentDatabase.addPoints();
+                break;
+            case FIND:
+                studentDatabase.findStudent();
+                break;
             case BACK:
                 if ((commandSequence.size() == 1 && commandSequence.get(0).equals(CommandType.BACK)) ||
                         (commandSequence.size() > 1 && commandSequence.get(0).equals(CommandType.BACK))) {
                     System.out.println("Enter 'exit' to exit the program.");
-                } else {
+                } else if (commandSequence.get(0).equals(CommandType.ADD_STUDENTS)) {
                     System.out.printf("Total %d students have been added.\n", studentDatabase.getStudents().size());
                 }
                 break;
@@ -51,9 +59,6 @@ public class UserInterface {
                 return;
             case NO_INPUT:
         }
-    }
-    public Scanner getScanner() {
-        return scanner;
     }
 
 }

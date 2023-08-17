@@ -2,9 +2,12 @@ package tracker.enums;
 
 public enum CommandType {
     ADD_STUDENTS("add students", "Enter student credentials or 'back' to return\n"),
+    ADD_POINTS("add points", "Enter an id and points or 'back' to return:\n"),
+    FIND("find", "Enter an id or 'back' to return\n"),
     BACK("back", ""),
     EXIT("exit", "Bye!\n"),
     NO_INPUT("", "No input.\n"),
+    LIST("list", ""),
     UNKNOWN_COMMAND( "UNKNOWN_COMMAND", "Error: unknown command!\n");
 
     public final String commandPrompt;

@@ -1,21 +1,25 @@
 package tracker;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import tracker.enums.Subject;
+
+import java.util.*;
 
 public class Student {
-    String fullName;
-    String firstName;
-    String lastName;
-    String email;
+    private String id;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private PointsRecord points;
+    private TreeMap<String, Student> students;
 
-    public Student(String studentCredentials) throws Exception {
+    public Student(String studentCredentials, TreeMap<String, Student> students) throws Exception {
+        this.students = students;
         parseStudentCredentials(studentCredentials);
+        id = String.valueOf(10000 + students.size());
+        this.points = new PointsRecord(id +" 0 0 0 0", this.students);
         boolean isFirstNameValid = verifyName(firstName);
         boolean isLastNameValid = verifyName(lastName);
         boolean isEmailValid = verifyEmail(email);
+        boolean isEmailInUse = verifyWhetherEmailInUse(email);
         if (!isFirstNameValid) {
             throw new RuntimeException("Incorrect first name.");
         }
@@ -24,6 +28,9 @@ public class Student {
         }
         if (!isEmailValid) {
             throw new RuntimeException("Incorrect email.");
+        }
+        if(isEmailInUse) {
+            throw new RuntimeException("This email is already taken.");
         }
         System.out.println("The student has been added.");
     }
@@ -42,29 +49,52 @@ public class Student {
 
     public boolean verifyName(String name) {
         return CustomRegex.verifyName(name);
-//                !CustomRegex.verifyThePresenceOfForbiddenCharacters(name) &&
-//                CustomRegex.verifyTheCorrectnessOfHyphenUse(name) &&
-//                CustomRegex.verifyTheCorrectnessOfApostropheUse(name) &&
-//                CustomRegex.verifyTheCorrectnessOfSpaceUse(name);
     }
 
     public boolean verifyEmail(String email) {
         return CustomRegex.verifyEmail(email);
     }
 
-    public String getFullName() {
-        return String.join(" ", getFirstName(), getLastName());
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
+    public boolean verifyWhetherEmailInUse(String email) {
+        for (Map.Entry<String, Student> studentEntry: students.entrySet()) {
+            if (studentEntry.getValue().getEmail().equals(email)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public String getEmail() {
         return email;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setPoints(PointsRecord points) {
+        for (int i = 0; i < 4; i++) {
+            Subject subjectToUpdate = Subject.values()[i];
+            Integer newPoints = points.getPoints().get(subjectToUpdate);
+            Integer oldPoints = this.points.getPoints().get(subjectToUpdate);
+            this.points.getPoints().put(subjectToUpdate, oldPoints + newPoints);
+        }
+    }
+
+    public PointsRecord getPoints() {
+        return points;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Student student = (Student) o;
+        return id.equals(student.id) && email.equals(student.email) && Objects.equals(points, student.points);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, email, points);
     }
 }
