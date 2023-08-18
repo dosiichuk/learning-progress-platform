@@ -1,21 +1,20 @@
 package tracker;
-import tracker.enums.Subject;
+import tracker.enums.CourseType;
+import tracker.utilities.CustomRegex;
 
 import java.util.*;
 
 public class Student {
     private String id;
+    private String email;
     private String firstName;
     private String lastName;
-    private String email;
-    private PointsRecord points;
     private TreeMap<String, Student> students;
 
     public Student(String studentCredentials, TreeMap<String, Student> students) throws Exception {
         this.students = students;
         parseStudentCredentials(studentCredentials);
-        id = String.valueOf(10000 + students.size());
-        this.points = new PointsRecord(id +" 0 0 0 0", this.students);
+        id = generateStudentId();
         boolean isFirstNameValid = verifyName(firstName);
         boolean isLastNameValid = verifyName(lastName);
         boolean isEmailValid = verifyEmail(email);
@@ -64,6 +63,10 @@ public class Student {
         return false;
     }
 
+    public String generateStudentId() {
+        return String.valueOf(10000 + students.size());
+    }
+
     public String getEmail() {
         return email;
     }
@@ -72,29 +75,16 @@ public class Student {
         return id;
     }
 
-    public void setPoints(PointsRecord points) {
-        for (int i = 0; i < 4; i++) {
-            Subject subjectToUpdate = Subject.values()[i];
-            Integer newPoints = points.getPoints().get(subjectToUpdate);
-            Integer oldPoints = this.points.getPoints().get(subjectToUpdate);
-            this.points.getPoints().put(subjectToUpdate, oldPoints + newPoints);
-        }
-    }
-
-    public PointsRecord getPoints() {
-        return points;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Student student = (Student) o;
-        return id.equals(student.id) && email.equals(student.email) && Objects.equals(points, student.points);
+        return id.equals(student.id) && email.equals(student.email);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, email, points);
+        return Objects.hash(id, email);
     }
 }

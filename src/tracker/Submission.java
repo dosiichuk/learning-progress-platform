@@ -1,15 +1,15 @@
 package tracker;
 
-import tracker.enums.Subject;
+import tracker.enums.CourseType;
 
 import java.util.TreeMap;
 
-public class PointsRecord {
-    private TreeMap<Subject, Integer> points;
+public class Submission {
     private String studentId;
+    private TreeMap<CourseType, Integer> points;
     private TreeMap<String, Student> students;
 
-    public PointsRecord(String inputString, TreeMap<String, Student> students) {
+    public Submission(String inputString, TreeMap<String, Student> students) {
         this.students = students;
         this.points = new TreeMap<>();
         try {
@@ -30,11 +30,11 @@ public class PointsRecord {
         }
         try {
             for (int i = 0; i < 4; i++) {
-                Integer subjectPoints = Integer.parseInt(parsedString[i + 1]);
-                if (subjectPoints < 0) {
+                Integer coursePoints = Integer.parseInt(parsedString[i + 1]);
+                if (coursePoints < 0) {
                     throw new RuntimeException("Incorrect points format.");
                 }
-                points.put(Subject.values()[i], subjectPoints);
+                points.put(CourseType.values()[i], coursePoints);
             }
         } catch (RuntimeException e) {
             throw new RuntimeException("Incorrect points format.");
@@ -48,7 +48,7 @@ public class PointsRecord {
         return false;
     }
 
-    public TreeMap<Subject, Integer> getPoints() {
+    public TreeMap<CourseType, Integer> getPoints() {
         return points;
     }
 

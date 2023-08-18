@@ -1,4 +1,4 @@
-package tracker;
+package tracker.utilities;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

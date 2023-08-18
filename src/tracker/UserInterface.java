@@ -9,11 +9,13 @@ import java.util.Scanner;
 public class UserInterface {
     private Scanner scanner;
     private StudentDatabase studentDatabase;
+    private CourseDatabase courseDatabase;
     private List<CommandType> commandSequence;
 
-    public UserInterface(Scanner scanner, StudentDatabase studentDatabase) {
+    public UserInterface(Scanner scanner, StudentDatabase studentDatabase, CourseDatabase courseDatabase) {
         this.scanner = scanner;
         this.studentDatabase = studentDatabase;
+        this.courseDatabase = courseDatabase;
         this.commandSequence = new ArrayList<>();
     }
 
@@ -39,7 +41,7 @@ public class UserInterface {
                 studentDatabase.listStudents();
                 break;
             case ADD_POINTS:
-                studentDatabase.addPoints();
+                courseDatabase.processSubmission();
                 break;
             case FIND:
                 studentDatabase.findStudent();
