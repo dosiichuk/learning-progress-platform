@@ -1,5 +1,7 @@
 package tracker.enums;
 
+import java.util.Locale;
+
 public enum CourseType {
     JAVA("Java", 600),
     DSA("DSA", 400),
@@ -20,5 +22,14 @@ public enum CourseType {
 
     public int getMaxPoints() {
         return maxPoints;
+    }
+
+    public static CourseType getCourseTypeFromTitle(String title) {
+        for (CourseType courseType: CourseType.values()) {
+            if (courseType.getTitle().toLowerCase().equals(title)) {
+                return courseType;
+            }
+        }
+        return null;
     }
 }

@@ -1,12 +1,12 @@
 package tracker;
 
+import tracker.enums.CommandType;
 import tracker.enums.CourseType;
+import tracker.utilities.CourseAverageSubmissionPointsComparator;
 import tracker.utilities.CourseNumEnrolledStudentsComparator;
+import tracker.utilities.CourseNumSubmissionsComparator;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class StatisticsService {
@@ -37,11 +37,50 @@ public class StatisticsService {
         this.courseMap = CourseDatabase.getCourseMap();
     }
 
-    public void showIndividualCourseStatistics() {
+    public void resetStatistics() {
+        maxNumEnrolledStudents = 0;
+        minNumEnrolledStudents = 0;
+        maxNumSubmissions = 0;
+        minNumSubmissions = 0;
+        highestAverageSubmissionPoints = 0;
+        lowestAverageSubmissionPoints = 0;
+        mostPopularCourses = new ArrayList<>();
+        leastPopularCourses = new ArrayList<>();
+        highestActivityCourses = new ArrayList<>();
+        lowestActivityCourses = new ArrayList<>();
+        easiestCourses = new ArrayList<>();
+        hardestCourses = new ArrayList<>();
+    }
 
+    public void showIndividualCourseStatistics() {
+        while(true) {
+            String userInput = scanner.nextLine();
+            if (userInput.equals(CommandType.BACK.getCommandPrompt())) {
+                userInterface.processCommand(CommandType.BACK);
+                return;
+            } else {
+                CourseType courseType = CourseType.getCourseTypeFromTitle(userInput);
+                if (courseType == null) {
+                    System.out.println("Unknown course.");
+                    continue;
+                } else {
+                    System.out.println("id    points    completed");
+                    Course course = courseMap.get(courseType);
+                    Map<Student, Map<String, Integer>> enrolledStudentsProgressMap = course.getEnrolledStudentsProgressMap();
+                    enrolledStudentsProgressMap.entrySet().stream().sorted(Map.Entry.comparingByKey(Comparator.reverseOrder()));
+                    for (Map.Entry<Student,Map<String, Integer>> studentMapEntry: enrolledStudentsProgressMap.entrySet()) {
+                        String studentId = studentMapEntry.getKey().getId();
+                        int numberOfPoints = studentMapEntry.getValue().get("points");
+                        float partCompleted = (float) numberOfPoints / courseType.getMaxPoints() * 100;
+                        System.out.println(String.format("%s %d        %.1f", studentId, numberOfPoints, partCompleted)+ "%");
+                    }
+                }
+            }
+        }
     }
 
     public void showAllCoursesSummary() {
+        resetStatistics();
         System.out.println("Type the name of a course to see details or 'back' to quit:");
         processCourseData();
         rankCourses();
@@ -51,6 +90,7 @@ public class StatisticsService {
         System.out.printf("Lowest activity: %s\n", lowestActivityCourses.size() == 0 ? "n/a" : String.join(", ", lowestActivityCourses));
         System.out.printf("Easiest course: %s\n", easiestCourses.size() == 0 ? "n/a" : String.join(", ", easiestCourses));
         System.out.printf("Hardest course: %s\n", hardestCourses.size() == 0 ? "n/a" : String.join(", ", hardestCourses));
+        showIndividualCourseStatistics();
     }
 
     public void processCourseData() {
@@ -71,27 +111,45 @@ public class StatisticsService {
             if (course.getNumEnrolledStudents() >= maxNumEnrolledStudents && course.getNumEnrolledStudents() > 0) {
                 maxNumEnrolledStudents = course.getNumEnrolledStudents();
                 course.setMostPopular(true);
+            }
+        });
+        courseMap.values().stream().sorted(new CourseNumEnrolledStudentsComparator()).forEach(course -> {
+            if (minNumEnrolledStudents == 0 && course.getNumSubmissions() > 0 && !course.isMostPopular()) {
+                minNumEnrolledStudents = course.getNumEnrolledStudents();
+                course.setLeastPopular(true);
             } else if (course.getNumEnrolledStudents() <= minNumEnrolledStudents && course.getNumSubmissions() > 0 && !course.isMostPopular()) {
                 minNumEnrolledStudents = course.getNumEnrolledStudents();
                 course.setLeastPopular(true);
             }
         });
-        courseMap.values().stream().sorted(new CourseNumEnrolledStudentsComparator().reversed()).forEach(course -> {
-            if (course.getNumEnrolledStudents() >= maxNumEnrolledStudents && course.getNumEnrolledStudents() > 0) {
-                maxNumEnrolledStudents = course.getNumEnrolledStudents();
-                course.setMostPopular(true);
-            } else if (course.getNumEnrolledStudents() <= minNumEnrolledStudents && course.getNumSubmissions() > 0 && !course.isMostPopular()) {
-                minNumEnrolledStudents = course.getNumEnrolledStudents();
-                course.setLeastPopular(true);
+        courseMap.values().stream().sorted(new CourseNumSubmissionsComparator().reversed()).forEach(course -> {
+            if (course.getNumSubmissions() >= maxNumSubmissions && course.getNumSubmissions() > 0) {
+                maxNumSubmissions = course.getNumSubmissions();
+                course.setHighestActivity(true);
             }
         });
-        courseMap.values().stream().sorted(new CourseNumEnrolledStudentsComparator().reversed()).forEach(course -> {
-            if (course.getNumEnrolledStudents() >= maxNumEnrolledStudents && course.getNumEnrolledStudents() > 0) {
-                maxNumEnrolledStudents = course.getNumEnrolledStudents();
-                course.setMostPopular(true);
-            } else if (course.getNumEnrolledStudents() <= minNumEnrolledStudents && course.getNumSubmissions() > 0 && !course.isMostPopular()) {
-                minNumEnrolledStudents = course.getNumEnrolledStudents();
-                course.setLeastPopular(true);
+        courseMap.values().stream().sorted(new CourseNumSubmissionsComparator()).forEach(course -> {
+            if (minNumSubmissions == 0 && course.getNumSubmissions() > 0 && !course.isHighestActivity()) {
+                minNumSubmissions = course.getNumSubmissions();
+                course.setLowestActivity(true);
+            } else if (course.getNumSubmissions() <= minNumSubmissions && course.getNumSubmissions() > 0 && !course.isHighestActivity()) {
+                minNumSubmissions = course.getNumSubmissions();
+                course.setLowestActivity(true);
+            }
+        });
+        courseMap.values().stream().sorted(new CourseAverageSubmissionPointsComparator().reversed()).forEach(course -> {
+            if (course.getAverageSubmissionPoints() >= highestAverageSubmissionPoints && course.getAverageSubmissionPoints() > 0) {
+                highestAverageSubmissionPoints = course.getAverageSubmissionPoints();
+                course.setEasiest(true);
+            }
+        });
+        courseMap.values().stream().sorted(new CourseAverageSubmissionPointsComparator()).forEach(course -> {
+            if (lowestAverageSubmissionPoints == 0 && course.getAverageSubmissionPoints() > 0 && !course.isEasiest()) {
+                lowestAverageSubmissionPoints = course.getAverageSubmissionPoints();
+                course.setHardest(true);
+            } else if (course.getAverageSubmissionPoints() <= lowestAverageSubmissionPoints && course.getAverageSubmissionPoints() > 0 && !course.isEasiest()) {
+                lowestAverageSubmissionPoints = course.getAverageSubmissionPoints();
+                course.setHardest(true);
             }
         });
         courseMap.values().stream().forEach(course -> {
@@ -99,11 +157,13 @@ public class StatisticsService {
                 mostPopularCourses.add(course.getCourseTitle());
             } else if (course.isLeastPopular()) {
                 leastPopularCourses.add(course.getCourseTitle());
-            } else if (course.isEasiest()) {
+            }
+            if (course.isEasiest()) {
                 easiestCourses.add(course.getCourseTitle());
             } else if (course.isHardest()) {
                 hardestCourses.add(course.getCourseTitle());
-            } else if (course.isHighestActivity()) {
+            }
+            if (course.isHighestActivity()) {
                 highestActivityCourses.add(course.getCourseTitle());
             } else if (course.isLowestActivity()) {
                 lowestActivityCourses.add(course.getCourseTitle());
@@ -122,7 +182,7 @@ public class StatisticsService {
         if (totalSubmissions == 0) {
             return 0;
         }
-        return totalPoints / totalSubmissions;
+        return (double) totalPoints / totalSubmissions;
     }
 
     public Integer calculateNumberOfSubmissions(Course course) {

@@ -4,7 +4,7 @@ import tracker.utilities.CustomRegex;
 
 import java.util.*;
 
-public class Student {
+public class Student implements Comparable<Student> {
     private String id;
     private String email;
     private String firstName;
@@ -86,5 +86,10 @@ public class Student {
     @Override
     public int hashCode() {
         return Objects.hash(id, email);
+    }
+
+    @Override
+    public int compareTo(Student anotherStudent) {
+        return this.getId().compareTo(anotherStudent.getId());
     }
 }
