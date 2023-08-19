@@ -26,7 +26,7 @@ public enum CourseType {
 
     public static CourseType getCourseTypeFromTitle(String title) {
         for (CourseType courseType: CourseType.values()) {
-            if (courseType.getTitle().toLowerCase().equals(title)) {
+            if (courseType.getTitle().toLowerCase().equals(title) || courseType.getTitle().equals(title)) {
                 return courseType;
             }
         }

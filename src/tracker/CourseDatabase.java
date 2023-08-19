@@ -57,11 +57,16 @@ public class CourseDatabase {
         TreeMap<CourseType, Integer> studentProgress = new TreeMap<>();
         for (CourseType courseType: CourseType.values()) {
             Map<Student, Map<String, Integer>> enrolledStudents = courseMap.get(courseType).getEnrolledStudentsProgressMap();
-            Integer searchedStudentProgress = enrolledStudents.get(student).get("points");
-            if (searchedStudentProgress == null) {
-                studentProgress.put(courseType, 0);
+            Map<String, Integer> enrolledStudentResults = enrolledStudents.get(student);
+            if (enrolledStudentResults != null) {
+                Integer searchedStudentProgress = enrolledStudents.get(student).get("points");
+                if (searchedStudentProgress == null) {
+                    studentProgress.put(courseType, 0);
+                } else {
+                    studentProgress.put(courseType, searchedStudentProgress);
+                }
             } else {
-                studentProgress.put(courseType, searchedStudentProgress);
+                studentProgress.put(courseType, 0);
             }
         }
         return studentProgress;

@@ -5,8 +5,11 @@ import tracker.enums.CourseType;
 import tracker.utilities.CourseAverageSubmissionPointsComparator;
 import tracker.utilities.CourseNumEnrolledStudentsComparator;
 import tracker.utilities.CourseNumSubmissionsComparator;
+import tracker.utilities.StudentPerformanceRecord;
 
 import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class StatisticsService {
@@ -50,6 +53,14 @@ public class StatisticsService {
         lowestActivityCourses = new ArrayList<>();
         easiestCourses = new ArrayList<>();
         hardestCourses = new ArrayList<>();
+        for (Course course: courseMap.values()) {
+            course.setMostPopular(false);
+            course.setLeastPopular(false);
+            course.setHighestActivity(false);
+            course.setLowestActivity(false);
+            course.setEasiest(false);
+            course.setHardest(false);
+        }
     }
 
     public void showIndividualCourseStatistics() {
@@ -64,13 +75,27 @@ public class StatisticsService {
                     System.out.println("Unknown course.");
                     continue;
                 } else {
+                    System.out.println(courseType.getTitle());
                     System.out.println("id    points    completed");
                     Course course = courseMap.get(courseType);
                     Map<Student, Map<String, Integer>> enrolledStudentsProgressMap = course.getEnrolledStudentsProgressMap();
-                    enrolledStudentsProgressMap.entrySet().stream().sorted(Map.Entry.comparingByKey(Comparator.reverseOrder()));
-                    for (Map.Entry<Student,Map<String, Integer>> studentMapEntry: enrolledStudentsProgressMap.entrySet()) {
-                        String studentId = studentMapEntry.getKey().getId();
-                        int numberOfPoints = studentMapEntry.getValue().get("points");
+                    Map<String, Integer> studentProgressMap = enrolledStudentsProgressMap
+                            .entrySet()
+                            .stream()
+                            .collect(Collectors.toMap(
+                                    entry -> entry.getKey().getId(),
+                                    entry -> entry.getValue().get("points")
+                            ));
+                    List<StudentPerformanceRecord> studentRecords = studentProgressMap.entrySet()
+                            .stream()
+                            .map(stringIntegerEntry -> new StudentPerformanceRecord(stringIntegerEntry.getKey(), stringIntegerEntry.getValue()))
+                            .collect(Collectors.toList());
+                    studentRecords.sort(Comparator.comparing(StudentPerformanceRecord::getPoints).reversed().thenComparing(StudentPerformanceRecord::getId));
+
+
+                    for (StudentPerformanceRecord studentPerformanceRecord: studentRecords) {
+                        String studentId = studentPerformanceRecord.getId();
+                        int numberOfPoints = studentPerformanceRecord.getPoints();
                         float partCompleted = (float) numberOfPoints / courseType.getMaxPoints() * 100;
                         System.out.println(String.format("%s %d        %.1f", studentId, numberOfPoints, partCompleted)+ "%");
                     }
