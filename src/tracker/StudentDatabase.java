@@ -9,8 +9,7 @@ import java.util.TreeMap;
 public class StudentDatabase {
     private Scanner scanner;
     private UserInterface userInterface = null;
-    private CourseDatabase courseDatabase = null;
-    private TreeMap<String, Student> students;
+    private static TreeMap<String, Student> students;
     private boolean isStudentCreated = false;
     private boolean isAddingStudentsFinished = false;
     private boolean isFindFinished = false;
@@ -62,7 +61,7 @@ public class StudentDatabase {
             }
             Student student = students.get(inputString);
             if (student != null) {
-                TreeMap<CourseType, Integer> points = courseDatabase.retrieveIndividualStudentProgress(student);
+                TreeMap<CourseType, Integer> points = CourseDatabase.retrieveIndividualStudentProgress(student);
                 System.out.printf("%s points: Java=%d; DSA=%d; Databases=%d; Spring=%d\n", student.getId(),
                         points.get(CourseType.JAVA),
                         points.get(CourseType.DSA),
@@ -85,15 +84,11 @@ public class StudentDatabase {
         }
     }
 
-    public TreeMap<String, Student> getStudents() {
+    public static TreeMap<String, Student> getStudents() {
         return students;
     }
 
     public void setUserInterface(UserInterface userInterface) {
         this.userInterface = userInterface;
-    }
-
-    public void setCourseDatabase(CourseDatabase courseDatabase) {
-        this.courseDatabase = courseDatabase;
     }
 }

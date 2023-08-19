@@ -10,14 +10,12 @@ import java.util.TreeMap;
 public class CourseDatabase {
     private Scanner scanner;
     private UserInterface userInterface;
-    private StudentDatabase studentDatabase;
-    private Map<CourseType, Course> courseMap;
+    private static Map<CourseType, Course> courseMap;
     private boolean isBatchSubmissionInProgress = false;
     private boolean isIndividualSubmissionComplete = false;
 
-    public CourseDatabase(Scanner scanner, StudentDatabase studentDatabase) {
+    public CourseDatabase(Scanner scanner) {
         this.scanner = scanner;
-        this.studentDatabase = studentDatabase;
         this.courseMap = Course.initCourses();
     }
 
@@ -30,7 +28,7 @@ public class CourseDatabase {
                 userInterface.processCommand(CommandType.BACK);
                 return null;
             }
-            Submission newSubmission = new Submission(inputString, studentDatabase.getStudents());
+            Submission newSubmission = new Submission(inputString, StudentDatabase.getStudents());
             isIndividualSubmissionComplete = true;
             return newSubmission;
         } catch (Exception e) {
@@ -43,7 +41,7 @@ public class CourseDatabase {
             try {
                 Submission newSubmission = createSubmission();
                 if (newSubmission != null) {
-                    Student studentToUpdate = studentDatabase.getStudents().get(newSubmission.getStudentId());
+                    Student studentToUpdate = StudentDatabase.getStudents().get(newSubmission.getStudentId());
                     updateStudentProgressMap(studentToUpdate, newSubmission);
                     System.out.println("Points updated.");
                 }
@@ -55,7 +53,7 @@ public class CourseDatabase {
         isBatchSubmissionInProgress = false;
     }
 
-    public TreeMap<CourseType, Integer> retrieveIndividualStudentProgress(Student student) {
+    public static TreeMap<CourseType, Integer> retrieveIndividualStudentProgress(Student student) {
         TreeMap<CourseType, Integer> studentProgress = new TreeMap<>();
         for (CourseType courseType: CourseType.values()) {
             Map<Student, Map<String, Integer>> enrolledStudents = courseMap.get(courseType).getEnrolledStudentsProgressMap();
@@ -82,7 +80,7 @@ public class CourseDatabase {
         this.userInterface = userInterface;
     }
 
-    public Map<CourseType, Course> getCourseMap() {
+    public static Map<CourseType, Course> getCourseMap() {
         return courseMap;
     }
 }

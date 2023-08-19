@@ -16,12 +16,12 @@ public class Tracker implements Runnable {
         System.out.println("Learning Progress Tracker");
         this.scanner = new Scanner(System.in);
         this.studentDatabase = new StudentDatabase(scanner);
-        this.courseDatabase = new CourseDatabase(scanner, studentDatabase);
+        this.courseDatabase = new CourseDatabase(scanner);
         this.userInterface = new UserInterface(scanner, studentDatabase, courseDatabase);
         this.studentDatabase.setUserInterface(userInterface);
         this.courseDatabase.setUserInterface(userInterface);
-        this.studentDatabase.setCourseDatabase(courseDatabase);
         this.statisticsService = new StatisticsService(userInterface,studentDatabase, courseDatabase, scanner);
+        userInterface.setStatisticsService(statisticsService);
     }
 
     @Override

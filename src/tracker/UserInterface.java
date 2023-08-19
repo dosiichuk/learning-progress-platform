@@ -11,6 +11,7 @@ public class UserInterface {
     private StudentDatabase studentDatabase;
     private CourseDatabase courseDatabase;
     private List<CommandType> commandSequence;
+    private StatisticsService statisticsService;
 
     public UserInterface(Scanner scanner, StudentDatabase studentDatabase, CourseDatabase courseDatabase) {
         this.scanner = scanner;
@@ -46,6 +47,9 @@ public class UserInterface {
             case FIND:
                 studentDatabase.findStudent();
                 break;
+            case STATISTICS:
+                statisticsService.showAllCoursesSummary();
+                break;
             case BACK:
                 if ((commandSequence.size() == 1 && commandSequence.get(0).equals(CommandType.BACK)) ||
                         (commandSequence.size() > 1 && commandSequence.get(0).equals(CommandType.BACK))) {
@@ -63,4 +67,7 @@ public class UserInterface {
         }
     }
 
+    public void setStatisticsService(StatisticsService statisticsService) {
+        this.statisticsService = statisticsService;
+    }
 }
