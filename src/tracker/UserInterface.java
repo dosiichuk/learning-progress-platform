@@ -10,13 +10,15 @@ public class UserInterface {
     private Scanner scanner;
     private StudentDatabase studentDatabase;
     private CourseDatabase courseDatabase;
+    private NotificationService notificationService;
     private List<CommandType> commandSequence;
     private StatisticsService statisticsService;
 
-    public UserInterface(Scanner scanner, StudentDatabase studentDatabase, CourseDatabase courseDatabase) {
+    public UserInterface(Scanner scanner, StudentDatabase studentDatabase, CourseDatabase courseDatabase, NotificationService notificationService) {
         this.scanner = scanner;
         this.studentDatabase = studentDatabase;
         this.courseDatabase = courseDatabase;
+        this.notificationService = notificationService;
         this.commandSequence = new ArrayList<>();
     }
 
@@ -49,6 +51,9 @@ public class UserInterface {
                 break;
             case STATISTICS:
                 statisticsService.showAllCoursesSummary();
+                break;
+            case NOTIFY:
+                notificationService.notifyStudentsAboutCourseCompletion();
                 break;
             case BACK:
                 if ((commandSequence.size() == 1 && commandSequence.get(0).equals(CommandType.BACK)) ||

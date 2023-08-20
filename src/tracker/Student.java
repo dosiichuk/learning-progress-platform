@@ -75,6 +75,18 @@ public class Student implements Comparable<Student> {
         return id;
     }
 
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getFullName() {
+        return getFirstName() + " " + getLastName();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

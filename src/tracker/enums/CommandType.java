@@ -5,6 +5,7 @@ public enum CommandType {
     ADD_POINTS("add points", "Enter an id and points or 'back' to return:\n"),
     FIND("find", "Enter an id or 'back' to return\n"),
     STATISTICS("statistics", ""),
+    NOTIFY("notify", ""),
     BACK("back", ""),
     EXIT("exit", "Bye!\n"),
     NO_INPUT("", "No input.\n"),

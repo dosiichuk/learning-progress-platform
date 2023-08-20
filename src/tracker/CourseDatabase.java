@@ -88,4 +88,5 @@ public class CourseDatabase {
     public static Map<CourseType, Course> getCourseMap() {
         return courseMap;
     }
+
 }

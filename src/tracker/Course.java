@@ -2,14 +2,11 @@ package tracker;
 
 import tracker.enums.CourseType;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 public class Course {
     private final CourseType courseType;
     private final String courseTitle;
-    private Map<Student, Map<String, Integer>> enrolledStudentsProgressMap;
     private int numEnrolledStudents;
     private int numSubmissions;
     private double averageSubmissionPoints;
@@ -19,11 +16,14 @@ public class Course {
     private boolean isLowestActivity = false;
     private boolean isEasiest = false;
     private boolean isHardest = false;
+    private Map<Student, Map<String, Integer>> enrolledStudentsProgressMap;
+    private List<Student> studentsWhoCompletedTheCourse;
 
     public Course(CourseType courseType, Map<Student, Map<String, Integer>> enrolledStudentsProgressMap) {
         this.courseType = courseType;
         this.courseTitle = courseType.getTitle();
         this.enrolledStudentsProgressMap = enrolledStudentsProgressMap;
+        this.studentsWhoCompletedTheCourse = new ArrayList<>();
     }
 
     public void updateEnrolledStudentsProgressMap(Student student, Integer points) {
@@ -31,13 +31,15 @@ public class Course {
             Map<String, Integer> currentProgressRecord = enrolledStudentsProgressMap.get(student);
             currentProgressRecord.put("points", currentProgressRecord.get("points") + points);
             currentProgressRecord.put("submissions", currentProgressRecord.get("submissions") + 1);
-
             enrolledStudentsProgressMap.put(student, currentProgressRecord);
         } else {
             Map<String, Integer> currentProgressRecord = new HashMap<>();
             currentProgressRecord.put("points", points);
             currentProgressRecord.put("submissions", 1);
             enrolledStudentsProgressMap.put(student, currentProgressRecord);
+        }
+        if (enrolledStudentsProgressMap.get(student).get("points") >= getCourseType().getMaxPoints()) {
+            studentsWhoCompletedTheCourse.add(student);
         }
     }
 
@@ -98,6 +100,10 @@ public class Course {
 
     public boolean isHardest() {
         return isHardest;
+    }
+
+    public List<Student> getStudentsWhoCompletedTheCourse() {
+        return studentsWhoCompletedTheCourse;
     }
 
     public void setNumEnrolledStudents(int numEnrolledStudents) {
